@@ -1,7 +1,7 @@
 var Firebase = require('firebase');
 var ref = new Firebase('https://blinding-inferno-1823.firebaseio.com/');
 var cachedUser = null;
-// var errors = [];
+var errors = [];
 
 var addNewUser = function(newUser){
   var key = newUser.uid;
@@ -9,25 +9,14 @@ var addNewUser = function(newUser){
 };
 
 var firebaseUtils = {
-  // getErrors: function() {
-  //   return true if errors.length == 0;
-  //   return errors;
-  // },
-  createUser: function(user, cb) {
+  getErrors: function(){
+    return errors;
+  },
+  createUser: function(user, cb, ecb) {
     console.log("user", user)
     ref.createUser(user, function(err) {
       if (err) {
-        switch (err.code) {
-          case "EMAIL_TAKEN":
-            console.log("The new user account cannot be created because the email is already in use.");
-            break;
-          case "INVALID_EMAIL":
-            // errors.push("Email is invalid");
-            console.log("The specified email is not a valid email.");
-            break;
-          default:
-            console.log("Error creating user:", err);
-        }
+        if(ecb) { ecb(err) }
       } else {
           this.loginWithPW(user, function(authData){
             addNewUser({

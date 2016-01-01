@@ -1,26 +1,49 @@
 var React = require('react');
 var firebaseUtils = require('../../utils/firebaseUtils');
-var Router = require('react-router');
-// import { createHistory, useBasename } from 'history';
-// import { Router, History } from 'react-router';
+import { createHistory, useBasename } from 'history'
+import { Router, History } from 'react-router';
 
-// const history = useBasename(createHistory)({
-//   basename: '/'
-// })
+const history = useBasename(createHistory)({
+  basename: '/'
+})
 
 var Register = React.createClass({
   mixins: [ Router.Navigation ],
+  getInitialState: function() {
+    return {errors: []};
+  },
   handleSubmit: function(e){
     e.preventDefault();
     var email = this.refs.email.getDOMNode().value;
     var pw = this.refs.pw.getDOMNode().value;
-    // console.log("testing in register", email + '   ' + pw);
     firebaseUtils.createUser({email: email, password: pw}, function(result){
+      console.log("user result", result);
       if(result){
-        // history.pushState(null, "/dashboard")
-        this.replaceWith('dashboard');
+        history.pushState(null, "/public/#/dashboard")
+        // this.replaceWith('dashboard');
       }
+    }.bind(this), function(err){
+      var error;
+      switch (err.code) {
+        case "EMAIL_TAKEN":
+          error = "The new user account cannot be created because the email is already in use.";
+          break;
+        case "INVALID_EMAIL":
+          error = "The specified email is not a valid email.";
+          break;
+        default:
+          error = "Error creating user";
+          console.log("Error creating user due to:", err);
+      }
+      this.setState({
+        errors: [error]
+      });
+      console.log("errors", this.state.errors[0]);
     }.bind(this));
+  },
+  componentDidMount: function(){
+  },
+  componentWillUnmount: function(){
   },
   render: function(){
     return (
@@ -28,13 +51,16 @@ var Register = React.createClass({
         <form onSubmit={this.handleSubmit}>
           <div className="form-group">
             <label> Email </label>
-            <input className="form-control" ref="email" placeholder="Email"/>
+            <input className="form-control" type="email" ref="email" placeholder="Email"/>
           </div>
           <div className="form-group">
             <label>Password</label>
             <input ref="pw" type="password" className="form-control" placeholder="Password" />
           </div>
+          <div>{this.state.errors[0]}</div>
+          <div></div>
           <button type="submit" className="btn btn-primary">Register</button>
+
         </form>
       </div>
     )
