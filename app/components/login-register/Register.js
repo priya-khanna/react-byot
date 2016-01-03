@@ -16,7 +16,9 @@ var Register = React.createClass({
     e.preventDefault();
     var email = this.refs.email.getDOMNode().value;
     var pw = this.refs.pw.getDOMNode().value;
-    firebaseUtils.createUser({email: email, password: pw}, function(result){
+    var name = this.refs.name.getDOMNode().value;
+    var mobile = this.refs.mobile.getDOMNode().value;
+    firebaseUtils.createUser({email: email, password: pw, name: name, mobile: mobile}, function(result){
       console.log("user result", result);
       if(result){
         history.pushState(null, "/public/#/dashboard")
@@ -50,8 +52,16 @@ var Register = React.createClass({
       <div className="col-sm-6 col-sm-offset-3">
         <form onSubmit={this.handleSubmit}>
           <div className="form-group">
+            <label>Name</label>
+            <input ref="name" className="form-control" placeholder="Name" />
+          </div>
+          <div className="form-group">
             <label> Email </label>
             <input className="form-control" type="email" ref="email" placeholder="Email"/>
+          </div>
+          <div className="form-group">
+            <label>Mobile</label>
+            <input ref="mobile" type="tel" maxlength="10" className="form-control" placeholder="Mobile" />
           </div>
           <div className="form-group">
             <label>Password</label>

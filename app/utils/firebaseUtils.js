@@ -18,9 +18,12 @@ var firebaseUtils = {
       if (err) {
         if(ecb) { ecb(err) }
       } else {
+        console.log("user in login", user)
           this.loginWithPW(user, function(authData){
             addNewUser({
               email: user.email,
+              mobile: user.mobile,
+              name: user.name,
               uid: authData.uid,
               token: authData.token
             });
@@ -28,17 +31,31 @@ var firebaseUtils = {
       }
     }.bind(this));
   },
+  // login: function(user, setUser, ecb){
+  //   ref.authWithPassword(user, function(err, authData){
+  //     if(err){
+  //       console.log("Error in logging user", err.message);
+  //       ecb(err);
+  //     } else {
+  //       cachedUser = authData;
+  //       authData.email = user.email;
+  //       cb(authData);
+  //     }
+
+  //   });
+
+  // },
   loginWithPW: function(userObj, cb, cbOnRegister){
     ref.authWithPassword(userObj, function(err, authData){
       if(err){
         console.log('Error on login:', err.message);
-        cbOnRegister && cbOnRegister(false);
+        cbOnRegister && cbOnRegister(false, err);
       } else {
         authData.email = userObj.email;
         cachedUser = authData;
         cb(authData);
         this.onChange(true);
-        cbOnRegister && cbOnRegister(true);
+        cbOnRegister && cbOnRegister(true, userObj);
       }
     }.bind(this));
   },
